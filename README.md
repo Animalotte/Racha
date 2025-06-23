@@ -7,4 +7,4 @@ integrantes: João Pedro Dias Ferraz - 12301067
              Bruno Gonçalves Belo - 12301922
              Joaquim de Assis Santana - 2400343
              Lucas Macedo Passagli Bittencourt - 12400564
-             italo alexandre souza soares - 12401072
+             italo alexandre souza soares - 12401072.
