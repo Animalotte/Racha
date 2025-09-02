@@ -42,7 +42,7 @@
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:hint="CPF"
-            android:inputType="number"
+            android:inputType="text"
             android:maxLength="14"
             android:textColor="#FFFFFF"
             android:textColorHint="#FF0000"

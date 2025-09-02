@@ -2,106 +2,64 @@ package com.example.racha
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.InputType
-import android.text.TextWatcher
-import android.view.MotionEvent
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.example.racha.data.AppDatabase
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
+    private lateinit var cpfEditText: EditText
+    private lateinit var senhaEditText: EditText
+    private lateinit var loginButton: Button
+    private lateinit var txtCadastro: TextView
+    private lateinit var db: AppDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        val edtCpf      = findViewById<EditText>(R.id.editTextCpf)
-        val edtSenha    = findViewById<EditText>(R.id.editTextSenha)
-        val btnEntrar   = findViewById<Button>(R.id.btnEntrar)
-        val txtCadastro = findViewById<TextView>(R.id.txtCadastro)
+        cpfEditText = findViewById(R.id.editTextCpf)
+        senhaEditText = findViewById(R.id.editTextSenha)
+        loginButton = findViewById(R.id.btnEntrar)
+        txtCadastro = findViewById(R.id.txtCadastro)
+        db = AppDatabase.instance(this)
 
-        // Aplica máscara no CPF (ARRUMAR!)
-        edtCpf.addTextChangedListener(MaskWatcher("###.###.###-##"))
+        // Aplicar máscara no CPF
+        cpfEditText.addTextChangedListener(MaskWatcher("###.###.###-##"))
 
+        // Preencher campos se vier de cadastro
+        val cpfExtra = intent.getStringExtra("CPF")
+        val senhaExtra = intent.getStringExtra("SENHA")
+        if (cpfExtra != null) cpfEditText.setText(cpfExtra)
+        if (senhaExtra != null) senhaEditText.setText(senhaExtra)
 
-        intent.getStringExtra("CPF")?.let { edtCpf.setText(it) }
-        intent.getStringExtra("SENHA")?.let { edtSenha.setText(it) }
+        loginButton.setOnClickListener {
+            val cpfMasked = cpfEditText.text.toString()
+            val cpf = cpfMasked.filter { it.isDigit() }
+            val senha = senhaEditText.text.toString()
 
-
-        var senhaVisivel = false
-        val originalTypeface = edtSenha.typeface
-        edtSenha.setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_UP) {
-                val drawableEnd = 2
-                edtSenha.compoundDrawables[drawableEnd]?.let { icon ->
-                    val clicouNoOlho = event.rawX >= (edtSenha.right - icon.bounds.width())
-                    if (clicouNoOlho) {
-                        senhaVisivel = !senhaVisivel
-                        edtSenha.inputType = if (senhaVisivel)
-                            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                        else
-                            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-
-                        edtSenha.typeface = originalTypeface
-
-                        val novoIcone = if (senhaVisivel)
-                            R.drawable.ic_visibility else R.drawable.ic_visibility_off
-
-                        edtSenha.setCompoundDrawablesWithIntrinsicBounds(
-                            0, 0, novoIcone, 0
-                        )
-                        edtSenha.setSelection(edtSenha.text?.length ?: 0)
-                        return@setOnTouchListener true
+            lifecycleScope.launch {
+                val user = db.userDao().login(cpf, senha)
+                if (user != null) {
+                    val intent = Intent(this@LoginActivity, InicioActivity::class.java)
+                    intent.putExtra("cpf", user.cpf)
+                    startActivity(intent)
+                    finish()
+                } else {
+                    runOnUiThread {
+                        Toast.makeText(this@LoginActivity, "CPF ou senha incorretos!", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
-            false
         }
-
 
         txtCadastro.setOnClickListener {
             startActivity(Intent(this, CadastroActivity::class.java))
-        }
-
-
-        btnEntrar.setOnClickListener {
-            val cpfPreenchido = edtCpf.text?.isNotBlank() == true
-            val senhaPreenchida = edtSenha.text?.isNotBlank() == true
-
-            if (!cpfPreenchido || !senhaPreenchida) {
-                Toast.makeText(
-                    this,
-                    "⚠ Por favor, preencha CPF e senha para continuar.",
-                    Toast.LENGTH_SHORT
-                ).show()
-            } else {
-                val intent = Intent(this, InicioActivity::class.java)
-                startActivity(intent)
-                finish()
-            }
-        }
-    }
-
-    // Aplicar máscara de CPF (ARRUMAR!)
-    class MaskWatcher(private val mask: String) : TextWatcher {
-        private var updating = false
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        override fun afterTextChanged(s: Editable?) {
-            if (updating) return
-            val digits = s.toString().filter(Char::isDigit)
-            val out = StringBuilder()
-            var i = 0
-            for (m in mask) {
-                if (m == '#') {
-                    if (i < digits.length) out.append(digits[i++]) else break
-                } else {
-                    if (i < digits.length) out.append(m) else break
-                }
-            }
-            updating = true
-            s?.replace(0, s.length, out.toString())
-            updating = false
+            finish()
         }
     }
 }

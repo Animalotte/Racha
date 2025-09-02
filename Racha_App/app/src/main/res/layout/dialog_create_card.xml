@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="#121212">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tipo do Cartão:"
+        android:textColor="#FF0000"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <RadioGroup
+        android:id="@+id/radioGroupType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/radioUnico"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Único"
+            android:textColor="#FF0000"
+            android:buttonTint="#FF0000"
+            android:layout_marginEnd="16dp" />
+
+        <RadioButton
+            android:id="@+id/radioRecorrente"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Recorrente"
+            android:textColor="#FF0000"
+            android:buttonTint="#FF0000" />
+    </RadioGroup>
+
+    <EditText
+        android:id="@+id/edtCardName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="#444444"
+        android:hint="Nome do cartão"
+        android:padding="12dp"
+        android:textColor="#FF0000"
+        android:textColorHint="#FF0000" />
+
+    <EditText
+        android:id="@+id/edtCardValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="#444444"
+        android:hint="Valor a pagar (R$)"
+        android:inputType="numberDecimal"
+        android:padding="12dp"
+        android:textColor="#FF0000"
+        android:textColorHint="#FF0000" />
+
+    <!-- Placeholder para convites futuros -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Convites serão adicionados aqui em breve"
+        android:textColor="#888888"
+        android:textSize="12sp" />
+</LinearLayout>
